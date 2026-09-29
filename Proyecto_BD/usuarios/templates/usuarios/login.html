@@ -1,0 +1,39 @@
+{% extends 'usuarios/base.html' %}
+{% block titulo %}Inicio de sesión{% endblock titulo %}
+{% block contenido %}
+<h1>Iniciar sesión</h1>
+
+{% if cuenta_bloqueada %}
+  <div style="background-color: #fcecec; border: 1px solid #e2aaaa; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+    <p style="color: #a83232; font-weight: bold; margin-top: 0;">⚠️ Tu cuenta ({{ usuario_bloqueado }}) ha sido bloqueada por exceder los intentos fallidos.</p>
+    <a href="{% url 'desbloquear_usuario' %}?usuario={{ usuario_bloqueado }}" style="display: inline-block; padding: 10px 16px; background-color: #d9534f; color: white; border-radius: 4px; text-decoration: none; font-weight: bold;">
+      🔓 Desbloquear mi cuenta ahora
+    </a>
+  </div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  {% if request.GET.next %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}" />
+  {% endif %}
+
+  <label for="id_usuario">Nombre de usuario</label>
+  <input type="text" id="id_usuario" name="username" required />
+
+  <label for="id_contrasena">Contraseña</label>
+  <input type="password" id="id_contrasena" name="password" required />
+
+  <button type="submit">Ingresar</button>
+</form>
+
+<p>
+  ¿No tienes una cuenta?
+  <a href="{% url 'registrar_usuario' %}">Regístrate</a>
+  <br />
+  <span style="font-size: 0.9em; margin-top: 6px; display: inline-block;">
+    ¿Cuenta bloqueada? <a href="{% url 'desbloquear_usuario' %}">Desbloquear aquí</a>
+  </span>
+</p>
+{% endblock %}
+
