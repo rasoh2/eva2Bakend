@@ -1,16 +1,250 @@
 {% extends 'usuarios/base.html' %}
-{% block titulo %}Registro{% endblock titulo %}
-{% block contenido %}
-<h1>Crear cuenta</h1>
 
-<form method="post">
+{# ============================================================================== #}
+{# EVA 1: PLANTILLA DE REGISTRO DE USUARIO (registro.html)                        #}
+{# Formulario con validaciones backend y controles interactivos en JavaScript    #}
+{# ============================================================================== #}
+
+{% block titulo %}Crear Cuenta{% endblock titulo %}
+
+{% block contenido %}
+<h1>Crear Cuenta</h1>
+
+<!-- Formulario POST hacia la vista registrar_usuario() -->
+<form method="post" id="formulario-registro" novalidate>
+  <!-- Token de protección CSRF -->
   {% csrf_token %}
-  {{ formulario.as_p }}
-  <button type="submit">Registrarse</button>
+
+  <!-- Errores generales / cruzados del formulario (ej: contraseñas no coinciden desde clean()) -->
+  {% if formulario.non_field_errors %}
+    <div class="mensaje mensaje-error">
+      {{ formulario.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <!-- ======================================================================== -->
+  <!-- CAMPO 1: NOMBRE DE USUARIO                                               -->
+  <!-- ======================================================================== -->
+  <div class="campo-grupo">
+    <label for="{{ formulario.username.id_for_label }}">
+      Nombre de usuario:
+    </label>
+    {{ formulario.username }}
+    {% if formulario.username.errors %}
+      <div class="errorlist">{{ formulario.username.errors }}</div>
+    {% endif %}
+    <small class="helptext">{{ formulario.username.help_text }}</small>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CAMPO 2: CORREO ELECTRÓNICO (ÚNICO)                                      -->
+  <!-- ======================================================================== -->
+  <div class="campo-grupo">
+    <label for="{{ formulario.email.id_for_label }}">
+      Correo electrónico:
+    </label>
+    {{ formulario.email }}
+    {% if formulario.email.errors %}
+      <div class="errorlist">{{ formulario.email.errors }}</div>
+    {% endif %}
+    <small class="helptext">{{ formulario.email.help_text }}</small>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CAMPO 3: CONTRASEÑA CON REQUISITOS EN TIEMPO REAL                        -->
+  <!-- ======================================================================== -->
+  <div class="campo-grupo">
+    <label for="{{ formulario.contrasena.id_for_label }}">
+      Contraseña:
+    </label>
+    <div class="password-wrapper">
+      {{ formulario.contrasena }}
+      <button 
+        type="button" 
+        id="btn-toggle-pass1" 
+        class="btn-toggle-password" 
+        title="Mostrar u ocultar contraseña"
+        tabindex="-1"
+      >
+        👁️
+      </button>
+    </div>
+    {% if formulario.contrasena.errors %}
+      <div class="errorlist">{{ formulario.contrasena.errors }}</div>
+    {% endif %}
+
+    <!-- CONTROLES JS (EVA 1): Advertencia visual de requisitos de contraseña -->
+    <div class="requisitos-box" id="caja-requisitos">
+      <div class="requisitos-titulo">Requisitos obligatorios de contraseña:</div>
+      <div class="requisito-item" id="req-largo">
+        <span class="req-icono">⚪</span> Mínimo 8 caracteres
+      </div>
+      <div class="requisito-item" id="req-mayuscula">
+        <span class="req-icono">⚪</span> Al menos una letra mayúscula (A-Z)
+      </div>
+      <div class="requisito-item" id="req-numero">
+        <span class="req-icono">⚪</span> Al menos un número (0-9)
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CAMPO 4: CONFIRMACIÓN DE CONTRASEÑA CON COMPARACIÓN EN TIEMPO REAL       -->
+  <!-- ======================================================================== -->
+  <div class="campo-grupo">
+    <label for="{{ formulario.confirmacion_contrasena.id_for_label }}">
+      Confirmar contraseña:
+    </label>
+    <div class="password-wrapper">
+      {{ formulario.confirmacion_contrasena }}
+      <button 
+        type="button" 
+        id="btn-toggle-pass2" 
+        class="btn-toggle-password" 
+        title="Mostrar u ocultar contraseña"
+        tabindex="-1"
+      >
+        👁️
+      </button>
+    </div>
+    {% if formulario.confirmacion_contrasena.errors %}
+      <div class="errorlist">{{ formulario.confirmacion_contrasena.errors }}</div>
+    {% endif %}
+    
+    <!-- Mensaje dinámico de coincidencia controlado por JavaScript -->
+    <div id="mensaje-coincidencia" class="coincidencia-alerta" style="display: none;"></div>
+  </div>
+
+  <!-- Botón de Envío -->
+  <button type="submit" id="btn-registrarse">Crear Mi Cuenta</button>
 </form>
 
-<p>
-  ¿Ya tienes una cuenta?
-  <a href="{% url 'iniciar_sesion' %}">Inicia sesión</a>
+<!-- Enlace de retorno al login -->
+<p style="margin-top: 20px;">
+  ¿Ya tienes una cuenta? <a href="{% url 'iniciar_sesion' %}">Inicia sesión aquí</a>
 </p>
-{% endblock %}
+{% endblock contenido %}
+
+{% block scripts %}
+<!-- ========================================================================== -->
+<!-- JAVASCRIPT: CONTROLES DE INTERFAZ REQUERIDOS EN EVA 1                      -->
+<!-- ========================================================================== -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Elementos del DOM
+    const form = document.getElementById("formulario-registro");
+    const passInput = document.getElementById("{{ formulario.contrasena.id_for_label }}");
+    const confirmInput = document.getElementById("{{ formulario.confirmacion_contrasena.id_for_label }}");
+    const btnToggle1 = document.getElementById("btn-toggle-pass1");
+    const btnToggle2 = document.getElementById("btn-toggle-pass2");
+
+    const reqLargo = document.getElementById("req-largo");
+    const reqMayus = document.getElementById("req-mayuscula");
+    const reqNum = document.getElementById("req-numero");
+    const msgCoincidencia = document.getElementById("mensaje-coincidencia");
+
+    // 2. FUNCIÓN: Mostrar u ocultar contraseñas
+    const setupToggle = (btn, input) => {
+      if (!btn || !input) return;
+      btn.addEventListener("click", () => {
+        const esPassword = input.getAttribute("type") === "password";
+        input.setAttribute("type", esPassword ? "text" : "password");
+        btn.textContent = esPassword ? "🙈" : "👁️";
+        btn.setAttribute("title", esPassword ? "Ocultar" : "Mostrar");
+      });
+    };
+
+    setupToggle(btnToggle1, passInput);
+    setupToggle(btnToggle2, confirmInput);
+
+    // 3. FUNCIÓN: Advertir requisitos de contraseña en tiempo real
+    const validarRequisitosPassword = () => {
+      const valor = passInput.value;
+      
+      // Regla 1: Mínimo 8 caracteres
+      const cumpleLargo = valor.length >= 8;
+      actualizarIndicador(reqLargo, cumpleLargo);
+
+      // Regla 2: Al menos una mayúscula
+      const cumpleMayus = /[A-Z]/.test(valor);
+      actualizarIndicador(reqMayus, cumpleMayus);
+
+      // Regla 3: Al menos un número
+      const cumpleNum = /\d/.test(valor);
+      actualizarIndicador(reqNum, cumpleNum);
+
+      return cumpleLargo && cumpleMayus && cumpleNum;
+    };
+
+    const actualizarIndicador = (elemento, cumple) => {
+      if (!elemento) return;
+      const icono = elemento.querySelector(".req-icono");
+      if (cumple) {
+        elemento.classList.add("cumplido");
+        elemento.classList.remove("incumplido");
+        if (icono) icono.textContent = "✅";
+      } else {
+        elemento.classList.remove("cumplido");
+        if (elemento.closest("form").dataset.submited === "true") {
+          elemento.classList.add("incumplido");
+        }
+        if (icono) icono.textContent = "⚪";
+      }
+    };
+
+    // 4. FUNCIÓN: Verificar que las dos contraseñas coincidan
+    const validarCoincidencia = () => {
+      const pass1 = passInput.value;
+      const pass2 = confirmInput.value;
+
+      if (!pass2) {
+        msgCoincidencia.style.display = "none";
+        return false;
+      }
+
+      msgCoincidencia.style.display = "block";
+      if (pass1 === pass2) {
+        msgCoincidencia.textContent = "✓ Las contraseñas coinciden perfectamente.";
+        msgCoincidencia.className = "coincidencia-alerta ok";
+        return true;
+      } else {
+        msgCoincidencia.textContent = "✗ Las contraseñas no coinciden.";
+        msgCoincidencia.className = "coincidencia-alerta error";
+        return false;
+      }
+    };
+
+    // Eventos de escucha en tiempo real (input / keyup)
+    passInput.addEventListener("input", () => {
+      validarRequisitosPassword();
+      if (confirmInput.value.length > 0) {
+        validarCoincidencia();
+      }
+    });
+
+    confirmInput.addEventListener("input", validarCoincidencia);
+
+    // 5. FUNCIÓN: Control previo al envío del formulario (Submit)
+    form.addEventListener("submit", (e) => {
+      form.dataset.submited = "true";
+      const requisitosOk = validarRequisitosPassword();
+      const coincidenOk = validarCoincidencia();
+
+      if (!requisitosOk) {
+        e.preventDefault();
+        alert("La contraseña no cumple con todos los requisitos mínimos (8 caracteres, 1 mayúscula y 1 número).");
+        passInput.focus();
+        return;
+      }
+
+      if (!coincidenOk) {
+        e.preventDefault();
+        alert("Las contraseñas no coinciden. Por favor corrígelas antes de enviar.");
+        confirmInput.focus();
+        return;
+      }
+      // Si todo es válido en el cliente, el formulario viaja al backend de Django
+    });
+  });
+</script>
+{% endblock scripts %}

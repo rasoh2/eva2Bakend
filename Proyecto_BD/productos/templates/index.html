@@ -1,40 +1,76 @@
+{# ============================================================================== #}
+{# EVA 2 - GUÍA 02 (UNIDAD 2): PLANTILLA DE MENÚ PRINCIPAL (index.html)          #}
+{# Menú central del sistema tras iniciar sesión con mensaje de bienvenida y CRUD   #}
+{# ============================================================================== #}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Index - Menú Principal</title>
+    <title>Menú Principal - Gestión de Productos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Inclusión de Bootstrap 5 CDN (Guía 3) para diseño visual responsivo -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Inclusión de Bootstrap Icons para íconos interactivos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body class="bg-light">
 
     <div class="container text-center mt-5">
-        <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="badge bg-primary fs-6">
-                    <i class="bi bi-person-circle"></i> {{ request.user.username }} (ID: {{ request.user.id }})
+        <div class="card shadow p-4 mx-auto" style="max-width: 620px; border-radius: 12px;">
+            
+            <!-- Barra superior: Información del usuario en sesión y botón de cierre de sesión -->
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <span class="badge bg-primary fs-6 p-2">
+                    <i class="bi bi-person-circle me-1"></i> Sesión activa: {{ request.user.username }}
                 </span>
+                
+                <!-- URL tag dinámico para cerrar sesión usando la ruta reversa 'cerrar_sesion' -->
                 <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                    <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
                 </a>
             </div>
 
-            <h1 class="mb-4">Menú Principal</h1>
-            <p class="text-muted">Sistema de Gestión de Productos</p>
+            <!-- ENUNCIADO EVA 1: "Mostrar un mensaje de bienvenida, por ejemplo: Bienvenido, Juan" -->
+            <div class="alert alert-success d-flex align-items-center justify-content-center p-3 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+                <div>
+                    <h5 class="alert-heading mb-0">¡Bienvenido, {{ request.user.first_name|default:request.user.username }}!</h5>
+                    <small class="text-muted">Has ingresado exitosamente al Sistema de Gestión de Productos.</small>
+                </div>
+            </div>
 
-            <div class="d-grid gap-3 mt-3">
-                <a href="/form_registrar" class="btn btn-success btn-lg">
-                    <i class="bi bi-plus-circle"></i> Ir Al Formulario de Registro
+            <h1 class="h2 mb-2 text-dark">Menú Principal</h1>
+            <p class="text-muted mb-4">Selecciona una de las opciones del módulo CRUD (Guías 1 a 3):</p>
+
+            <!-- Acciones del Menú (Guía 2 - Paso 5) -->
+            <div class="d-grid gap-3">
+                <!-- Enlace al formulario de inserción (Guía 2 & 3) -->
+                <a href="/form_registrar" class="btn btn-success btn-lg py-3 shadow-sm">
+                    <i class="bi bi-plus-circle-fill me-2"></i> Ir Al Formulario de Registro
                 </a>
-                <a href="/listado" class="btn btn-primary btn-lg">
-                    <i class="bi bi-table"></i> Ir Al Listado de Productos
+                
+                <!-- Enlace al listado de productos registrados (Guía 2 & 3) -->
+                <a href="/listado" class="btn btn-primary btn-lg py-3 shadow-sm">
+                    <i class="bi bi-table me-2"></i> Ir Al Listado de Productos
                 </a>
             </div>
+
+            <!-- Acceso directo al panel de administración si el usuario es staff/superusuario -->
+            {% if request.user.is_staff %}
+            <div class="mt-4 pt-3 border-top">
+                <a href="/admin/" target="_blank" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Abrir Panel Django Admin
+                </a>
+            </div>
+            {% endif %}
+
         </div>
     </div>
 
+    <!-- Script de Bootstrap 5 para componentes dinámicos (tooltips, modales, etc.) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

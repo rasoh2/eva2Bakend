@@ -1,7 +1,26 @@
 {% extends 'usuarios/base.html' %}
-{% block titulo %}Inicio{% endblock titulo %}
+
+{# ============================================================================== #}
+{# EVA 1: PLANTILLA DE BIENVENIDA / INICIO (inicio.html)                          #}
+{# Vista protegida con @login_required y enlace al CRUD de Productos (EVA 2)      #}
+{# ============================================================================== #}
+
+{% block titulo %}Inicio de Usuario{% endblock titulo %}
+
 {% block contenido %}
-<h1>Bienvenido, {{ user.username }}</h1>
-<p>Has ingresado correctamente al sistema.</p>
-<a href="{% url 'cerrar_sesion' %}">Cerrar sesión</a>
-{% endblock %}
+<h1>¡Bienvenido, {{ user.username }}!</h1>
+
+<p>Has ingresado correctamente al sistema de usuarios con tu cuenta autenticada.</p>
+
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+  <!-- Enlace para ir al módulo CRUD de Productos (EVA 2) -->
+  <a href="{% url 'index' %}" class="btn-bloque" style="background-color: var(--color-exito);">
+    📦 Ir a la Gestión de Productos (CRUD)
+  </a>
+
+  <!-- Enlace para cerrar sesión -->
+  <a href="{% url 'cerrar_sesion' %}" class="btn-bloque btn-peligro">
+    🚪 Cerrar sesión
+  </a>
+</div>
+{% endblock contenido %}

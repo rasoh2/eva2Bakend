@@ -1,43 +1,81 @@
+{# ============================================================================== #}
+{# EVA 2 - GUÍAS 02 Y 03 (UNIDAD 2): FORMULARIO DE ACTUALIZACIÓN (form_actualizar) #}
+{# Modificación de producto existente con precarga de valores y POST seguro       #}
+{# ============================================================================== #}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Actualizar Producto</title>
+    <title>Actualizar Producto - Modificación</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Íconos de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-<body>
+<body class="bg-light">
 
-    <div class="container text-center mt-4">
-        <h1>Formulario Actualizar</h1>
-        <h4><a href="/listado">Volver al Listado</a> | <a href="/">Volver al Index</a></h4>
+    <div class="container text-center mt-5 mb-5" style="max-width: 580px;">
+        <div class="card shadow p-4" style="border-radius: 12px;">
+            
+            <h1 class="h3 mb-3 text-dark">
+                <i class="bi bi-pencil-square me-2 text-warning"></i>Actualizar Producto #{{ producto.id }}
+            </h1>
+            
+            <!-- Enlaces de navegación -->
+            <h5 class="mb-4">
+                <a href="/listado" class="text-decoration-none text-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Volver al Listado
+                </a>
+                <span class="mx-2 text-muted">|</span>
+                <a href="/" class="text-decoration-none">
+                    <i class="bi bi-house-door me-1"></i>Volver al Index
+                </a>
+            </h5>
 
-        <form action="/actualizar/{{ producto.id }}" method="post" class="mt-4 mx-auto" style="max-width: 500px;">
-            {% csrf_token %}
+            <!-- ================================================================== -->
+            <!-- FORMULARIO DE EDICIÓN: POST hacia /actualizar/<id>                  -->
+            <!-- ================================================================== -->
+            <form action="/actualizar/{{ producto.id }}" method="post" class="text-start">
+                
+                <!-- Token de seguridad CSRF obligatorio -->
+                {% csrf_token %}
 
-            <input type="text" name="txtnom" value="{{ producto.nombre }}" placeholder="Nombre de Producto" required class="form-control form-control-lg" />
+                <!-- Campo 1: Nombre del Producto pre-llenado con su valor actual -->
+                <div class="mb-3">
+                    <label for="id_txtnom" class="form-label fw-bold">Nombre del Producto:</label>
+                    <input type="text" id="id_txtnom" name="txtnom" value="{{ producto.nombre }}" placeholder="Nombre de Producto" required class="form-control form-control-lg" />
+                </div>
 
-            <br/>
+                <!-- Campo 2: Marca del Producto con opción seleccionada automáticamente -->
+                <div class="mb-3">
+                    <label for="id_cbomar" class="form-label fw-bold">Marca:</label>
+                    <select id="id_cbomar" name="cbomar" required class="form-select form-select-lg">
+                        <option value="">-- Seleccione Marca --</option>
+                        <option value="A cuenta" {% if producto.marca == 'A cuenta' %}selected{% endif %}>A cuenta</option>
+                        <option value="Jumbo" {% if producto.marca == 'Jumbo' %}selected{% endif %}>Jumbo</option>
+                        <option value="Lider" {% if producto.marca == 'Lider' %}selected{% endif %}>Lider</option>
+                    </select>
+                </div>
 
-            <select name="cbomar" required class="form-select form-select-lg">
-                <option value="">Seleccione Marca</option>
-                <option value="A cuenta" {% if producto.marca == 'A cuenta' %}selected{% endif %}>A cuenta</option>
-                <option value="Jumbo" {% if producto.marca == 'Jumbo' %}selected{% endif %}>Jumbo</option>
-                <option value="Lider" {% if producto.marca == 'Lider' %}selected{% endif %}>Lider</option>
-            </select>
+                <!-- Campo 3: Precio del Producto pre-llenado -->
+                <div class="mb-4">
+                    <label for="id_txtpre" class="form-label fw-bold">Precio ($ CLP):</label>
+                    <input type="number" id="id_txtpre" name="txtpre" value="{{ producto.precio }}" min="1" max="9999999" placeholder="Precio de Producto" required class="form-control form-control-lg" />
+                </div>
 
-            <br/>
+                <!-- Botón de guardado de modificaciones -->
+                <button type="submit" class="btn btn-warning btn-lg w-100 shadow-sm text-dark fw-bold">
+                    <i class="bi bi-check2-circle me-2"></i>Guardar Cambios
+                </button>
+            </form>
 
-            <input type="number" name="txtpre" value="{{ producto.precio }}" min="1" max="9999999" placeholder="Precio de Producto" required class="form-control form-control-lg" />
-
-            <br/>
-
-            <input type="submit" value="Guardar Cambios" class="btn btn-warning btn-lg" style="width:100%"/>
-        </form>
-
+        </div>
     </div>
 
+    <!-- Script de Bootstrap 5 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

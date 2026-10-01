@@ -1,39 +1,112 @@
 {% extends 'usuarios/base.html' %}
-{% block titulo %}Inicio de sesión{% endblock titulo %}
-{% block contenido %}
-<h1>Iniciar sesión</h1>
 
+{# ============================================================================== #}
+{# EVA 1: PLANTILLA DE INICIO DE SESIÓN (login.html)                              #}
+{# Implementa login con Django, control de 3 fallos y toggle JS de contraseñas    #}
+{# ============================================================================== #}
+
+{% block titulo %}Iniciar Sesión{% endblock titulo %}
+
+{% block contenido %}
+<h1>Iniciar Sesión</h1>
+
+<!-- ========================================================================== -->
+<!-- ALERTA DE CUENTA BLOQUEADA (3 INTENTOS FALLIDOS EN BD)                     -->
+<!-- ========================================================================== -->
 {% if cuenta_bloqueada %}
-  <div style="background-color: #fcecec; border: 1px solid #e2aaaa; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
-    <p style="color: #a83232; font-weight: bold; margin-top: 0;">⚠️ Tu cuenta ({{ usuario_bloqueado }}) ha sido bloqueada por exceder los intentos fallidos.</p>
-    <a href="{% url 'desbloquear_usuario' %}?usuario={{ usuario_bloqueado }}" style="display: inline-block; padding: 10px 16px; background-color: #d9534f; color: white; border-radius: 4px; text-decoration: none; font-weight: bold;">
+  <div style="background-color: var(--color-error-fondo); border: 1px solid var(--color-error-borde); padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+    <p style="color: var(--color-error); font-weight: bold; margin-top: 0; margin-bottom: 12px;">
+      ⚠️ Tu cuenta (<strong>{{ usuario_bloqueado }}</strong>) ha sido bloqueada por superar el límite de 3 intentos fallidos.
+    </p>
+    <a href="{% url 'desbloquear_usuario' %}?usuario={{ usuario_bloqueado }}" class="btn-bloque btn-peligro" style="margin-top: 0; font-size: 0.92rem;">
       🔓 Desbloquear mi cuenta ahora
     </a>
   </div>
 {% endif %}
 
-<form method="post">
+<!-- ========================================================================== -->
+<!-- FORMULARIO DE AUTENTICACIÓN POST                                           -->
+<!-- ========================================================================== -->
+<form method="post" id="formulario-login">
+  <!-- Token de seguridad CSRF obligatorio para prevenir ataques cross-site -->
   {% csrf_token %}
+
+  <!-- Si Django pasó un parámetro 'next' en la URL (ej: /login/?next=/listado), lo guardamos -->
   {% if request.GET.next %}
     <input type="hidden" name="next" value="{{ request.GET.next }}" />
   {% endif %}
 
-  <label for="id_usuario">Nombre de usuario</label>
-  <input type="text" id="id_usuario" name="username" required />
+  <!-- Campo 1: Nombre de usuario -->
+  <div class="campo-grupo">
+    <label for="id_usuario">Nombre de usuario:</label>
+    <input 
+      type="text" 
+      id="id_usuario" 
+      name="username" 
+      required 
+      placeholder="Ingresa tu usuario"
+      autocomplete="username" 
+    />
+  </div>
 
-  <label for="id_contrasena">Contraseña</label>
-  <input type="password" id="id_contrasena" name="password" required />
+  <!-- Campo 2: Contraseña con botón JavaScript de mostrar/ocultar -->
+  <div class="campo-grupo">
+    <label for="id_contrasena">Contraseña:</label>
+    <div class="password-wrapper">
+      <input 
+        type="password" 
+        id="id_contrasena" 
+        name="password" 
+        required 
+        placeholder="Ingresa tu contraseña"
+        autocomplete="current-password" 
+      />
+      <!-- Botón interactivo JavaScript para alternar tipo 'password' / 'text' -->
+      <button 
+        type="button" 
+        id="btn-toggle-login-pass" 
+        class="btn-toggle-password" 
+        title="Mostrar u ocultar contraseña"
+        aria-label="Mostrar u ocultar contraseña"
+      >
+        👁️
+      </button>
+    </div>
+  </div>
 
-  <button type="submit">Ingresar</button>
+  <!-- Botón de envío de credenciales -->
+  <button type="submit" id="btn-ingresar">Ingresar al Sistema</button>
 </form>
 
-<p>
-  ¿No tienes una cuenta?
-  <a href="{% url 'registrar_usuario' %}">Regístrate</a>
-  <br />
-  <span style="font-size: 0.9em; margin-top: 6px; display: inline-block;">
-    ¿Cuenta bloqueada? <a href="{% url 'desbloquear_usuario' %}">Desbloquear aquí</a>
-  </span>
-</p>
-{% endblock %}
+<!-- Enlaces de navegación rápida -->
+<div style="margin-top: 24px; text-align: center;">
+  <p style="margin-bottom: 8px;">
+    ¿No tienes una cuenta? <a href="{% url 'registrar_usuario' %}">Regístrate aquí</a>
+  </p>
+  <p style="margin-top: 0; font-size: 0.88rem;">
+    ¿Tu cuenta está bloqueada? <a href="{% url 'desbloquear_usuario' %}">Desbloquear cuenta</a>
+  </p>
+</div>
+{% endblock contenido %}
 
+{% block scripts %}
+<!-- ========================================================================== -->
+<!-- JAVASCRIPT: CONTROL DE INTERFAZ (MOSTRAR / OCULTAR CONTRASEÑA)             -->
+<!-- ========================================================================== -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const passInput = document.getElementById("id_contrasena");
+    const toggleBtn = document.getElementById("btn-toggle-login-pass");
+
+    if (passInput && toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        // Alterna entre tipo 'password' (oculto) y 'text' (visible)
+        const esPassword = passInput.getAttribute("type") === "password";
+        passInput.setAttribute("type", esPassword ? "text" : "password");
+        toggleBtn.textContent = esPassword ? "🙈" : "👁️";
+        toggleBtn.setAttribute("title", esPassword ? "Ocultar contraseña" : "Mostrar contraseña");
+      });
+    }
+  });
+</script>
+{% endblock scripts %}

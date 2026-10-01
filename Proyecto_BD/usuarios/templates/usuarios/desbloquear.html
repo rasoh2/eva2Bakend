@@ -1,19 +1,45 @@
 {% extends 'usuarios/base.html' %}
+
+{# ============================================================================== #}
+{# EVA 1: PLANTILLA DE DESBLOQUEO DE CUENTA (desbloquear.html)                    #}
+{# Restablece el contador de intentos y el booleano bloqueado en la base de datos #}
+{# ============================================================================== #}
+
 {% block titulo %}Desbloquear Cuenta{% endblock titulo %}
+
 {% block contenido %}
 <h1>Desbloquear Cuenta</h1>
 
-<p>Ingresa tu nombre de usuario para restablecer tu cuenta y desbloquear el acceso.</p>
+<p style="color: var(--color-texto-suave); margin-bottom: 20px;">
+  Ingresa tu nombre de usuario registrado para restablecer los intentos fallidos y rehabilitar tu acceso al sistema.
+</p>
 
+<!-- Formulario de desbloqueo POST -->
 <form method="post">
+  <!-- Token de seguridad CSRF de Django -->
   {% csrf_token %}
-  <label for="id_usuario">Nombre de usuario</label>
-  <input type="text" id="id_usuario" name="username" value="{{ usuario_predeterminado }}" required placeholder="Ej: perrito" />
 
-  <button type="submit" style="background-color: #d9534f;">🔓 Desbloquear Mi Cuenta</button>
+  <div class="campo-grupo">
+    <label for="id_usuario">Nombre de usuario a desbloquear:</label>
+    <input 
+      type="text" 
+      id="id_usuario" 
+      name="username" 
+      value="{{ usuario_predeterminado }}" 
+      required 
+      placeholder="Ej: seba_admin" 
+      autocomplete="username"
+    />
+  </div>
+
+  <!-- Botón de acción con estilo destacado -->
+  <button type="submit" class="btn-peligro">
+    🔓 Desbloquear Mi Cuenta
+  </button>
 </form>
 
-<p style="margin-top: 20px;">
+<!-- Navegación de retorno al login -->
+<p style="margin-top: 24px;">
   <a href="{% url 'iniciar_sesion' %}">← Volver al Inicio de Sesión</a>
 </p>
-{% endblock %}
+{% endblock contenido %}

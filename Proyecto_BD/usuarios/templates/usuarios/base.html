@@ -1,18 +1,34 @@
+{# ============================================================================== #}
+{# EVA 1: PLANTILLA BASE (base.html)                                              #}
+{# Esqueleto Master Page para el módulo de usuarios con herencia de plantillas     #}
+{# ============================================================================== #}
 {% load static %}
 
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block titulo %}Sistema de usuarios{% endblock %}</title>
+    
+    <!-- Bloque dinámico para el título de la pestaña del navegador -->
+    <title>{% block titulo %}Sistema de Autenticación{% endblock %} - EVA 1</title>
+    
+    <!-- Inclusión de la hoja de estilos personalizada con static -->
     <link rel="stylesheet" href="{% static 'usuarios/css/estilos.css' %}" />
   </head>
   <body>
+    <!-- Contenedor central estilizado para login, registro y desbloqueo -->
     <main class="contenedor-principal">
+      
+      <!-- ==================================================================== -->
+      <!-- SISTEMA DE MENSAJES TEMPORALES (django.contrib.messages)             -->
+      <!-- Muestra alertas enviadas desde views.py con messages.success/error   -->
+      <!-- ==================================================================== -->
       {% if messages %}
         <div class="mensajes" aria-live="polite">
           {% for message in messages %}
+            <!-- Asigna la clase CSS dinámica según la severidad: error, success, info -->
             <div class="mensaje mensaje-{{ message.tags }}">
               {{ message }}
             </div>
@@ -20,7 +36,12 @@
         </div>
       {% endif %}
 
+      <!-- Bloque donde se inyecta el contenido de cada página hija -->
       {% block contenido %}{% endblock contenido %}
+      
     </main>
+    
+    <!-- Bloque opcional para scripts JavaScript adicionales de páginas hijas -->
+    {% block scripts %}{% endblock scripts %}
   </body>
 </html>

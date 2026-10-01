@@ -1,15 +1,51 @@
+/* ==============================================================================
+   EVA 1: HOJA DE ESTILOS CSS PERSONALIZADA (estilos.css)
+   ==============================================================================
+   Requerimientos de EVA 1 - Front End:
+   "CSS básico para mejorar visualmente:
+    - Formulario
+    - Inputs
+    - Botones
+    - Mensajes de error
+    - Contenedor del login"
+   
+   Estructura:
+   1. Variables CSS globales (:root) para consistencia de paleta y tipografía.
+   2. Reset básico (box-sizing) y centrado general del viewport con degradado.
+   3. Tarjeta / Contenedor principal (.contenedor-principal) con sombra y bordes redondeados.
+   4. Formularios, campos de texto (inputs) e interactividad con estados :focus y :hover.
+   5. Botones con transiciones suaves y micro-animaciones.
+   6. Alertas de Django (.mensaje-error, .mensaje-success, .mensaje-info).
+   7. Controles de JavaScript (indicadores de contraseña, botones de mostrar/ocultar).
+============================================================================== */
+
 :root {
+  /* Paleta cromática principal */
   --color-fondo: #eef2f5;
   --color-contenedor: #ffffff;
   --color-principal: #176b87;
   --color-principal-hover: #12566d;
   --color-texto: #24323d;
+  --color-texto-suave: #62727c;
   --color-borde: #cbd5dc;
+  
+  /* Estados del sistema */
   --color-error: #a83232;
+  --color-error-fondo: #fcecec;
+  --color-error-borde: #e2aaaa;
+  
   --color-exito: #247a4d;
+  --color-exito-fondo: #edf9f1;
+  --color-exito-borde: #a9d7bb;
+
+  --color-aviso: #b7791f;
+  --color-aviso-fondo: #fefcbf;
+  --color-aviso-borde: #fbd38d;
+
   --sombra: 0 12px 30px rgba(36, 50, 61, 0.12);
 }
 
+/* Reset básico para cálculo coherente de dimensiones */
 * {
   box-sizing: border-box;
 }
@@ -29,45 +65,58 @@ body {
     ),
     var(--color-fondo);
   color: var(--color-texto);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* ==============================================================================
+   CONTENEDOR PRINCIPAL / CARD DEL LOGIN Y REGISTRO
+   ============================================================================== */
 .contenedor-principal {
-  width: min(100%, 480px);
-  padding: 36px;
+  width: min(100%, 500px);
+  padding: 36px 32px;
   background: var(--color-contenedor);
   border: 1px solid #dce3e8;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: var(--sombra);
 }
 
 h1 {
   margin-top: 0;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   color: var(--color-principal);
-  font-size: 2rem;
+  font-size: 1.85rem;
   text-align: center;
+  font-weight: 700;
 }
 
+/* ==============================================================================
+   FORMULARIOS E INPUTS
+   ============================================================================== */
 form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-form > p {
-  margin: 0;
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
   text-align: left;
+  gap: 6px;
 }
 
-form > p label {
+label {
   display: block;
-  margin: 0 0 7px;
-  font-weight: bold;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--color-texto);
 }
 
-input {
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
   width: 100%;
   padding: 12px 14px;
   background: #fbfcfd;
@@ -75,22 +124,113 @@ input {
   border-radius: 6px;
   color: var(--color-texto);
   font: inherit;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
+  font-size: 0.95rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: var(--color-principal);
   background: var(--color-contenedor);
-  box-shadow: 0 0 0 3px rgba(23, 107, 135, 0.16);
+  box-shadow: 0 0 0 3px rgba(23, 107, 135, 0.18);
 }
 
-button {
+/* ==============================================================================
+   CONTENEDOR DE CONTRASEÑA CON BOTÓN MOSTRAR/OCULTAR (JAVASCRIPT)
+   ============================================================================== */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
-  margin-top: 18px;
+}
+
+.password-wrapper input {
+  padding-right: 48px; /* Espacio para que el texto no se monte sobre el botón */
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  margin: 0;
+  width: auto;
+  color: var(--color-texto-suave);
+  font-size: 1.1rem;
+  border-radius: 4px;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.btn-toggle-password:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-principal);
+  transform: translateY(-50%);
+}
+
+/* ==============================================================================
+   CAJA DE ADVERTENCIA DE REQUISITOS DE CONTRASEÑA (EVA 1)
+   ============================================================================== */
+.requisitos-box {
+  background: #f8fafc;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.requisitos-titulo {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-texto-suave);
+}
+
+.requisito-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--color-texto-suave);
+  transition: color 200ms ease;
+}
+
+.requisito-item.cumplido {
+  color: var(--color-exito);
+  font-weight: 600;
+}
+
+.requisito-item.incumplido {
+  color: var(--color-error);
+}
+
+.coincidencia-alerta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.coincidencia-alerta.ok {
+  color: var(--color-exito);
+}
+
+.coincidencia-alerta.error {
+  color: var(--color-error);
+}
+
+/* ==============================================================================
+   BOTONES
+   ============================================================================== */
+button,
+.btn-bloque {
+  width: 100%;
+  margin-top: 14px;
   padding: 13px 18px;
   border: 0;
   border-radius: 6px;
@@ -98,70 +238,103 @@ button {
   color: white;
   cursor: pointer;
   font: inherit;
-  font-weight: bold;
-  transition:
-    background 160ms ease,
-    transform 160ms ease;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
-button:hover {
+button:hover,
+.btn-bloque:hover {
   background: var(--color-principal-hover);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 107, 135, 0.25);
 }
 
 button:focus-visible {
-  outline: 3px solid rgba(23, 107, 135, 0.28);
+  outline: 3px solid rgba(23, 107, 135, 0.35);
   outline-offset: 2px;
 }
 
-p {
-  line-height: 1.6;
-  text-align: center;
+.btn-peligro {
+  background-color: var(--color-error);
 }
 
-a {
-  color: var(--color-principal);
-  font-weight: bold;
+.btn-peligro:hover {
+  background-color: #8c2828;
 }
 
+/* ==============================================================================
+   MENSAJES DE ALERTA DE DJANGO (MESSAGES FRAMEWORK)
+   ============================================================================== */
 .mensajes {
   margin-bottom: 20px;
 }
 
 .mensaje {
-  padding: 12px;
-  border-radius: 4px;
-  font-weight: bold;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .mensaje-error {
-  border: 1px solid #e2aaaa;
-  background: #fcecec;
+  border: 1px solid var(--color-error-borde);
+  background: var(--color-error-fondo);
   color: var(--color-error);
 }
 
 .mensaje-success {
-  border: 1px solid #a9d7bb;
-  background: #edf9f1;
+  border: 1px solid var(--color-exito-borde);
+  background: var(--color-exito-fondo);
   color: var(--color-exito);
 }
 
+.mensaje-info {
+  border: 1px solid #bee3f8;
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+
+/* Lista de errores nativa de Django form */
 .errorlist {
-  margin: 0;
-  padding: 0;
+  margin: 4px 0 0 0;
+  padding-left: 18px;
   color: var(--color-error);
-  list-style: none;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .helptext {
   display: block;
-  margin-top: 6px;
-  color: #62727c;
+  margin-top: 4px;
+  color: var(--color-texto-suave);
   font-size: 0.82rem;
   line-height: 1.4;
 }
 
+p {
+  line-height: 1.5;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+a {
+  color: var(--color-principal);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--color-principal-hover);
+}
+
+/* ==============================================================================
+   RESPONSIVIDAD MÓVIL
+   ============================================================================== */
 @media (max-width: 520px) {
   body {
     padding: 12px;
