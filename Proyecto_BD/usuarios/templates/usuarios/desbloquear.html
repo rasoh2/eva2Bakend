@@ -1,0 +1,19 @@
+{% extends 'usuarios/base.html' %}
+{% block titulo %}Desbloquear Cuenta{% endblock titulo %}
+{% block contenido %}
+<h1>Desbloquear Cuenta</h1>
+
+<p>Ingresa tu nombre de usuario para restablecer tu cuenta y desbloquear el acceso.</p>
+
+<form method="post">
+  {% csrf_token %}
+  <label for="id_usuario">Nombre de usuario</label>
+  <input type="text" id="id_usuario" name="username" value="{{ usuario_predeterminado }}" required placeholder="Ej: perrito" />
+
+  <button type="submit" style="background-color: #d9534f;">🔓 Desbloquear Mi Cuenta</button>
+</form>
+
+<p style="margin-top: 20px;">
+  <a href="{% url 'iniciar_sesion' %}">← Volver al Inicio de Sesión</a>
+</p>
+{% endblock %}

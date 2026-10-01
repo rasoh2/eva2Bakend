@@ -1,0 +1,26 @@
+{% load static %}
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block titulo %}Sistema de usuarios{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'usuarios/css/estilos.css' %}" />
+  </head>
+  <body>
+    <main class="contenedor-principal">
+      {% if messages %}
+        <div class="mensajes" aria-live="polite">
+          {% for message in messages %}
+            <div class="mensaje mensaje-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block contenido %}{% endblock contenido %}
+    </main>
+  </body>
+</html>

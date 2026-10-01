@@ -1,0 +1,21 @@
+# Entorno virtual
+venv/
+env/
+ENV/
+
+# Python bytecode y caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code y editores
+.vscode/
+.idea/
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Archivos comprimidos temporales
+*.zip
